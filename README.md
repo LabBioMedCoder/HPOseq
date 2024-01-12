@@ -29,6 +29,4 @@ In the data folder, we provide the data needed for the model.
 After the model is run, the "result.csv" will be generated and saved in the current folder.
 
 # Run
-* python intra.py
-* python inter.py
 * python Ensemble_module.py
