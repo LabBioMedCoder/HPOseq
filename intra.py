@@ -41,7 +41,6 @@ def Evaluation_result(predict_result, hpo_list, feature_name=''):
 def reshape(features):
     return np.hstack(features).reshape((len(features), len(features[0])))
 
-
 def encode_protein_sequences_no_itertools(protein_sequences):
     amino_acids = 'ACDEFGHIKLMNPQRSTVWY'
     trinucleotide_dict = {}
@@ -68,7 +67,6 @@ def encode_protein_sequences_no_itertools(protein_sequences):
 
     return encoded_sequences
 
-
 def CNNModule(input_dim, hidden_size, num_classes):
     model = Sequential([
         Embedding(input_dim, 256, input_length=1998),
@@ -83,11 +81,8 @@ def CNNModule(input_dim, hidden_size, num_classes):
     ])
     return model
 
-
 def CNN_model_train(learningrate, batch_size, epochs, hidden_size, seq_list, hpo_list, model_save_path):
     input_dim = 8001
-    hidden_size = hidden_size
-    num_classes = len(hpo_list[0])
     feature_list = encode_protein_sequences_no_itertools(seq_list)
     X = np.array(feature_list)
     Y = np.array(hpo_list)
@@ -111,19 +106,15 @@ def CNN_model_train(learningrate, batch_size, epochs, hidden_size, seq_list, hpo
 
     return predictions
 
-
 uniprot = pd.read_pickle('data/features_20211010.pkl')
-print(uniprot.columns)
 
 hpo_list = []
 seq_list = []
-
 for i, row in uniprot.iterrows():
     hpo_label = row['hpo_one_hot']
     seq = row['seq']
     hpo_list.append(hpo_label)
     seq_list.append(seq)
-
 intra_predict = CNN_model_train(0.0001, 1024, 80, 2048, seq_list, hpo_list,
                                 'data/best_model/best_seq_model.h5')
 uniprot['intra_result'] = intra_predict
