@@ -311,32 +311,6 @@ def VGAE_model_train(seq_list, net_list):
 
     return embeddings
 
-
-def encode_protein_sequences_no_itertools(protein_sequences):
-    amino_acids = 'ACDEFGHIKLMNPQRSTVWY'
-    trinucleotide_dict = {}
-    idx = 0
-    for a1 in amino_acids:
-        for a2 in amino_acids:
-            for a3 in amino_acids:
-                trinucleotide_dict[f'{a1}{a2}{a3}'] = idx
-                idx += 1
-    trinucleotide_dict['000'] = idx
-
-    def encode_sequence(sequence):
-        cleaned_sequence = ''.join([aa for aa in sequence if aa in amino_acids])
-        if len(cleaned_sequence) >= 2000:
-            cleaned_sequence = cleaned_sequence[:2000]
-        else:
-            cleaned_sequence += '0' * (2000 - len(cleaned_sequence))
-        encoded_sequence = [trinucleotide_dict.get(cleaned_sequence[i:i + 3], trinucleotide_dict['000'])
-                            for i in range(2000 - 2)]
-
-        return encoded_sequence
-    encoded_sequences = [encode_sequence(seq) for seq in protein_sequences]
-
-    return encoded_sequences
-
 uniprot = pd.read_pickle('data/features_20211010.pkl')
 print(uniprot.columns)
 
