@@ -21,7 +21,6 @@ from tensorflow.keras.models import load_model
 warnings.filterwarnings('ignore')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
 class Model(object):
     def __init__(self, **kwargs):
         allowed_kwargs = {'name', 'logging'}
@@ -56,13 +55,11 @@ class Model(object):
     def predict(self):
         pass
 
-
 def clean_amino_acid_sequence(sequence):
     valid_amino_acids = set('ACDEFGHIKLMNPQRSTVWY')
     cleaned_sequence = ''.join([aa for aa in sequence if aa in valid_amino_acids])
 
     return cleaned_sequence
-
 
 def Evaluation_result(predict_result, hpo_list, feature_name=''):
     Y_test = hpo_list
@@ -71,7 +68,6 @@ def Evaluation_result(predict_result, hpo_list, feature_name=''):
     if feature_name != '':
         print(feature_name, ":", perf_cc['all'])
     return perf_cc['all']['aupr'], perf_cc['all']['F-max']
-
 
 class GCNModelVAE(Model):
     def __init__(self, placeholders, num_features, num_nodes, features_nonzero, hidden1, hidden2, **kwargs):
@@ -118,7 +114,6 @@ class GCNModelVAE(Model):
                                                    act=lambda x: x,
                                                    logging=self.logging)(self.z)
 
-
 def Model_comparison(model1, model2, X_val, y_val):
     model1_result = model1.predict(X_val)
     model2_result = model2.predict(X_val)
@@ -128,7 +123,6 @@ def Model_comparison(model1, model2, X_val, y_val):
         return model2
     else:
         return model1
-
 
 def CalculateKSCTriad(sequence, gap, features, AADict):
     res = []
@@ -148,7 +142,6 @@ def CalculateKSCTriad(sequence, gap, features, AADict):
             res.append((myDict[f] - minValue) / maxValue)
 
     return res
-
 
 def CTriad(fastas, gap=0, **kw):
     AAGroup = {
@@ -187,9 +180,8 @@ def CTriad(fastas, gap=0, **kw):
 
     return encodings
 
-
-def train_gcn(features, adj_train, model_str="gcn_vae", hidden1=2048, hidden2=1024):
-    adj_orig = adj_train
+def train_gcn(features, adj_network, hidden_size1=2048, hidden_size2=1024):
+    adj_orig = adj_network
     adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape)
     adj_orig.eliminate_zeros()
     # adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = mask_test_edges(adj_train)
@@ -211,55 +203,34 @@ def train_gcn(features, adj_train, model_str="gcn_vae", hidden1=2048, hidden2=10
     features_nonzero = features[1].shape[0]
     pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
     norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
-
-    # Create model
-    model = None
-    if model_str == 'gcn_ae':
-        model = GCNModelAE(placeholders, num_features, features_nonzero, hidden1, hidden2)
-    elif model_str == 'gcn_vae':
-        model = GCNModelVAE(placeholders, num_features, num_nodes, features_nonzero, hidden1, hidden2)
-    elif model_str == 'vae':
-        model = VAE(placeholders, num_features, num_nodes, features_nonzero, hidden1, hidden2)
+    model = GCNModelVAE(placeholders, num_features, num_nodes, features_nonzero, hidden_size1, hidden_size2)
 
     # Optimizer
     with tf.name_scope('optimizer'):
-        if model_str == 'gcn_ae':
-            opt = OptimizerAE(preds=model.reconstructions,
-                              labels=tf.reshape(tf.sparse_tensor_to_dense(placeholders['adj_orig'],
-                                                                          validate_indices=False), [-1]),
-                              pos_weight=pos_weight,
-                              norm=norm,
-                              lr=0.01)
-        elif model_str == 'gcn_vae':
-            opt = OptimizerVAE(preds=model.reconstructions,
-                               labels=tf.reshape(tf.compat.v1.sparse_tensor_to_dense(placeholders['adj_orig'],
-                                                                                     validate_indices=False), [-1]),
-                               model=model, num_nodes=num_nodes,
-                               pos_weight=pos_weight,
-                               norm=norm,
-                               lr=0.001)
+        opt = OptimizerVAE(preds=model.reconstructions,
+                            labels=tf.reshape(tf.compat.v1.sparse_tensor_to_dense(placeholders['adj_orig'],
+                                                                                validate_indices=False), [-1]),
+                            model=model, num_nodes=num_nodes,
+                            pos_weight=pos_weight,
+                            norm=norm,
+                            lr=0.001)
 
-    # Initialize session
     sess = tf.compat.v1.Session()
     sess.run(tf.compat.v1.global_variables_initializer())
     adj_label = adj_train + sp.eye(adj_train.shape[0])
     adj_label = sparse_to_tuple(adj_label)
 
-    # Train model
     epochs = 50
 
     for epoch in range(epochs):
 
-        # Construct feed dictionary，feed_dict的作用是给使用placeholder创建出来的tensor赋值，feed使用一个值临时替换一个op的输出结果
         feed_dict = construct_feed_dict(adj_norm, adj_label, features, placeholders)
         feed_dict.update({placeholders['dropout']: 0})
         # Run single weight update
-        outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)  # 执行整个定义好的计算图
+        outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)  
 
         if epoch % 10 == 0:
             print("Epoch:", '%04d' % (epoch + 1), "train_loss=", "{:.5f}".format(outs[1]))
-
-    # return embedding for each protein
     emb = sess.run(model.z_mean, feed_dict=feed_dict)
 
     return emb
