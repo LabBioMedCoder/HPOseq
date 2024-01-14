@@ -34,16 +34,9 @@ class Fuse_Model(nn.Module):
         x = F.sigmoid(x)
         return x
 
-print("开始加载pkl...")
 feature = []
-CTDC = []
-FAMILY = []
-DOMAIN = []
-PPMI = []
 label = []
-mask_info= []
 uniprot = pd.read_pickle("data/features_20211010.pkl")
-print(uniprot.columns)
 feature_num = 2
 for i, row in uniprot.iterrows():
     temp_list = []
@@ -56,9 +49,7 @@ input_features = np.array(feature)
 labels = np.array(label)
 
 input_size = input_features.shape[1]
-print("input_size",input_size)
 output_size = labels.shape[1]
-print("output_size",output_size)
 hidden_size = 1024
 
 K = 5
@@ -106,7 +97,7 @@ for fold, (train_index, val_index) in enumerate(kfold.split(input_features)):
             epoch_loss += loss.item()
             loss.backward()
             optimizer.step()
-        if epoch%10 == 0:
+        if epoch%1000 == 0:
             print(f"Fold: {fold+1}, Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss}")
 
     val_inputs = val_features
@@ -124,7 +115,7 @@ for k_score in score:
         ave_result[a] += k_score['all'][a]
 for b in ave_result:
     ave_result[b] = ave_result[b]/K
-print("交叉验证最终结果是：",ave_result)
+
 df = pd.DataFrame(ave_result,index=[0])
 df = pd.DataFrame(df.values.T, columns=df.index, index=df.columns)
 df = df.transpose()
