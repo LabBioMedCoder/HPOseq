@@ -77,7 +77,7 @@ def CNNModule(input_dim, hidden_size, num_classes):
         Conv1D(16, 64, padding='valid', activation='relu', strides=1),
         MaxPooling1D(64, 32),
         Flatten(),
-        Dense(2048, activation='relu'),
+        Dense(hidden_size, activation='relu'),
         Dropout(0.3),
         Dense(num_classes, activation='sigmoid')
     ])
@@ -124,7 +124,7 @@ for i, row in uniprot.iterrows():
     hpo_list.append(hpo_label)
     seq_list.append(seq)
 
-intra_predict = CNN_model_train(0.0001, 1024, 1, 2048, seq_list, hpo_list,
+intra_predict = CNN_model_train(0.0001, 1024, 80, 2048, seq_list, hpo_list,
                                 'data/best_model/best_seq_model.h5')
 uniprot['intra_result'] = intra_predict
 uniprot.to_pickle("../../data/features_20211010.pkl")
