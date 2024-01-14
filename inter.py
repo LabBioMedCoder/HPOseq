@@ -58,10 +58,7 @@ class Model(object):
 
 
 def clean_amino_acid_sequence(sequence):
-    # 定义 20 种常见氨基酸
     valid_amino_acids = set('ACDEFGHIKLMNPQRSTVWY')
-
-    # 移除不在 20 种常见氨基酸中的字符
     cleaned_sequence = ''.join([aa for aa in sequence if aa in valid_amino_acids])
 
     return cleaned_sequence
@@ -192,16 +189,12 @@ def CTriad(fastas, gap=0, **kw):
 
 
 def train_gcn(features, adj_train, model_str="gcn_vae", hidden1=2048, hidden2=1024):
-    # 存储原始邻接矩阵（无对角线条目）
     adj_orig = adj_train
-    # 去除对角线
     adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape)
-    # 只要其中的非0部分
     adj_orig.eliminate_zeros()
     # adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = mask_test_edges(adj_train)
     adj = adj_train
-
-    # 将稀疏矩阵处理成二维向量
+    
     adj_norm = preprocess_graph(adj)
     # Define placeholders
     tf.compat.v1.disable_eager_execution()
@@ -248,9 +241,7 @@ def train_gcn(features, adj_train, model_str="gcn_vae", hidden1=2048, hidden2=10
 
     # Initialize session
     sess = tf.compat.v1.Session()
-    # 初始化模型全局参数
     sess.run(tf.compat.v1.global_variables_initializer())
-    # 添加对角矩阵
     adj_label = adj_train + sp.eye(adj_train.shape[0])
     adj_label = sparse_to_tuple(adj_label)
 
