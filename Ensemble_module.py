@@ -50,7 +50,6 @@ labels = np.array(label)
 
 input_size = input_features.shape[1]
 output_size = labels.shape[1]
-hidden_size = 1024
 
 K = 5
 kfold = KFold(n_splits=K, shuffle=True)
