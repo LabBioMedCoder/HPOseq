@@ -54,8 +54,6 @@ output_size = labels.shape[1]
 K = 5
 kfold = KFold(n_splits=K, shuffle=True)
 
-true_label = []
-predict_label = []
 score = []
 ave_result = {'aupr':0,'F-max':0}
 
@@ -106,8 +104,6 @@ for fold, (train_index, val_index) in enumerate(kfold.split(input_features)):
     y_score = val_predictions.detach().cpu()
     perf_cc = get_results(Y_test, y_score)
     score.append(perf_cc)
-    print(perf_cc)
-    print(f"Fold: {fold+1}, Validation Loss: {val_loss}")
 
 for k_score in score:
     for a in k_score['all']:
