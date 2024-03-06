@@ -8,12 +8,10 @@ import pandas as pd
 from keras.models import load_model
 import numpy as np
 from sklearn.model_selection import KFold
-import torch
 from src.model.evaluation import get_results
 import warnings
 
 warnings.filterwarnings('ignore')
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def Model_comparison(model1, model2, X_val, y_val):
     model1_result = model1.predict(X_val)
