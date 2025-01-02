@@ -30,5 +30,5 @@ We provide one fold of a five fold cross validation as the training set and test
 After the model is run, the "result.csv" will be generated and saved in the current folder.
 
 # Run
-* python Ensemble_module.py
 Although we build several .py files, running our code is very simple. More specifically, we only need to run Ensemble_module.py to train the model, outputting prediction results. 
+* python Ensemble_module.py
