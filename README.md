@@ -16,7 +16,8 @@ The framework of HPOseq.
 
 # Dataset
 In the data folder, we provide the data needed for the model.
-
+We provide one fold of a five fold cross validation as the training set and test set, and the training set and test set are trainjson and testjson respectively. In addition, we also provided processed feature sequences involving 22. rar files. At runtime, simply download and merge them, and they can be directly input into our model.
+ 
 # Resources
 * creats_genelist.py: Download the gene-HPO relationship file from the HPO database and generate genelist.txt and gene_hpo.json based on the file
 * Authentic labels.py: Add the ancestor nodes of the current HPO annotation relation to the relation after processing.
@@ -30,3 +31,4 @@ After the model is run, the "result.csv" will be generated and saved in the curr
 
 # Run
 * python Ensemble_module.py
+Although we build several .py files, running our code is very simple. More specifically, we only need to run Ensemble_module.py to train the model, outputting prediction results. 
