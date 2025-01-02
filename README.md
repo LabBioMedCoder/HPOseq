@@ -15,8 +15,7 @@ The framework of HPOseq.
 * torch==1.7.1
 
 # Dataset
-In the data folder, we provide the data needed for the model.
-We provide one fold of a five fold cross validation as the training set and test set, and the training set and test set are trainjson and testjson respectively. In addition, we also provided processed feature sequences involving 22. rar files. At runtime, simply download and merge them, and they can be directly input into our model.
+In the data folder, we provide all the necessary data for the model. Specifically, we offer one fold of a five-fold cross-validation, which includes both the training set (train.json) and the test set (test.json). Additionally, we have provided processed feature sequences in the form of .rar files. Simply download and merge these files during runtime, and then can be directly used  for our model.
  
 # Resources
 * creats_genelist.py: Download the gene-HPO relationship file from the HPO database and generate genelist.txt and gene_hpo.json based on the file
