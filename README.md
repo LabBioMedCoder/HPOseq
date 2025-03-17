@@ -1,7 +1,7 @@
 # HPOseq
 **HPOseq: A Deep Ensemble Model for Predicting the Protein-Phenotype Relationships Based on Protein Sequences**
 <div align="center">
-  <img src="https://github.com/LabBioMedCoder/HPOseq/blob/main/HPOseq_structure.png" width="800px" height="300px">
+  <img src="https://github.com/LabBioMedCoder/HPOseq/blob/main/HPOseq_structure.png" width="800px" height="600px">
 </div>
 The framework of HPOseq.
 
